@@ -81,6 +81,12 @@ export const demos: { name: string; items: Item[] }[] = [
         description:
           'Pass context between Client Components that cross Server/Client Component boundary',
       },
+      {
+        name: 'Chat App',
+        slug: 'chat',
+        description:
+          'Create a real-time chat app with Server Components and Client Components',
+      },
     ],
   },
   {
