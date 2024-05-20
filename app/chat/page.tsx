@@ -1,104 +1,82 @@
 'use client';
 
-import { io } from 'socket.io-client';
-import React, { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
+import React, { useState, useCallback, useEffect } from 'react';
 
 export default function Page() {
-  const [message, setMessage] = useState('');
-  const [clientMessages, setClientMessages] = useState<string[]>([]);
-  const [serverMessages, setServerMessages] = useState<string[]>([]);
+  const [message, setMessage] = useState<string>('');
+  const [aiResponse, setAiResponse] = useState<string>('');
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   const URL = 'https://e2069eb72e59.ngrok.app/';
-  const socket = io(URL, { autoConnect: false });
 
-  useEffect(() => {
-    // Connect to the socket
-    socket.connect();
+  const connectSocket = useCallback(() => {
+    // Only create a new socket if one doesn't already exist
+    if (!socket) {
+      const newSocket: Socket = io(URL, { autoConnect: false });
+      newSocket.connect();
 
-    // Event listeners
-    socket.on('connect', () =>
-      console.log('Connected to the Socket.IO server.'),
-    );
-    socket.on('error', (error) => console.error('Socket.IO error:', error));
-    socket.on('ai_response', (data) => {
-      console.log('Received response:', data);
-      setServerMessages((prevMessages) => [...prevMessages, data]);
-    });
+      newSocket.on('connect', () => {
+        console.log('Connected to the Socket.IO server.');
+        // Send the message after establishing the connection
+        newSocket.emit('streaming_chat', {
+          promptMessage: message,
+          task: 'basic_chat',
+          index: 1,
+          uid: '1234567890',
+        });
+      });
 
-    // Cleanup on unmount
-    return () => {
-      socket.off('connect');
-      socket.off('error');
-      socket.off('ai_response');
-      socket.close();
-      console.log('Disconnected from the server.');
-    };
-  }, []);
+      newSocket.on('error', (error: any) =>
+        console.error('Socket.IO error:', error),
+      );
 
-  const settings = {
-    customOptions: false,
-    aiPreferencesMain: 'Direct AI chat',
-    aiPreferencesSecond: 'Chat With One AI',
-    quickAnswer: true,
-    improveQuestions: false,
-    makeSmallTalk: true,
-    submitOnEnter: true,
-  };
+      newSocket.on('chat_response', (data: any) => {
+        console.log('Received chunk:', data);
+        // Check if the 'data' field exists in the response object and append it
+        if (data && typeof data === 'object' && 'data' in data) {
+          setAiResponse((prevResponse) => prevResponse + data.data); // Append the text from the 'data' field
+        }
+      });
 
-  // Send message function
-  const sendMessage = (message: string) => {
-    const messageData = {
-      message,
-      answers: [],
-      history: [],
-      settings,
-      page: 'chatbot.backend_functions.openai_chatbot',
-    };
-    console.log('Sending message:', messageData);
-    socket.emit('user_message', { messageData }, (response: any) => {
-      console.log('Server acknowledged the message:', response);
-    });
-    setClientMessages((prevMessages) => [...prevMessages, message]);
-  };
-
-  // Form submission handler
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-    if (message) {
-      sendMessage(message);
-      setMessage(''); // Clear the input after sending
+      setSocket(newSocket);
     }
-  };
+  }, [message, socket]);
+
+  // Clean up the socket when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (socket) {
+        socket.disconnect();
+        console.log('Disconnected from the server.');
+      }
+    };
+  }, [socket]);
 
   return (
     <div>
-      <ul className="mb-8 space-y-2">
-        {clientMessages.map((message, index) => (
-          <li key={index}>
-            <strong>Client:</strong> {message}
-          </li>
-        ))}
-        {serverMessages.map((message, index) => (
-          <li key={index}>
-            <strong>Server:</strong> {message}
-          </li>
-        ))}
-      </ul>
-      <form id="chatForm" onSubmit={handleSubmit} className="flex">
-        <input
-          id="messageInput"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="w-full rounded-md border border-gray-300 p-2 text-black"
-        />
-        <button
-          className="ml-2 rounded-md bg-blue-500 px-4 py-2 text-white"
-          type="submit"
-        >
-          Send
-        </button>
-      </form>
+      <input
+        id="messageInput"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type a message..."
+        className="w-full rounded-md border border-gray-300 p-2 text-black"
+      />
+      <button
+        className="ml-2 rounded-md bg-blue-500 px-4 py-2 text-white"
+        onClick={connectSocket} // This triggers connection and message send
+        disabled={!message.trim()}
+        type="button"
+      >
+        Send
+      </button>
+      <textarea
+        id="aiResponse"
+        value={aiResponse}
+        readOnly
+        placeholder="AI Response..."
+        className="mt-2 h-48 w-full rounded-md border border-gray-300 p-2 text-black"
+      />
     </div>
   );
 }
