@@ -1,3 +1,5 @@
+/*
+
 import { notFound } from 'next/navigation';
 import type { Function } from './functions';
 
@@ -44,3 +46,4 @@ export async function getCategory({ slug }: { slug: string }) {
 
   return category;
 }
+*/
