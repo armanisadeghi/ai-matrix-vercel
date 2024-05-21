@@ -1,3 +1,5 @@
+//app/patterns/active-links/_components/nav-links.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -9,7 +11,6 @@ export function NavLinks({
 }: {
   links: { href: string; name: string }[];
 }) {
-  // Alternatively, you could use `useParams` or `useSelectedLayoutSegment(s)`
   const pathname = usePathname();
 
   return (
@@ -18,6 +19,7 @@ export function NavLinks({
         const isActive = pathname === link.href;
         return (
           <Link
+            key={link.href} // Add the 'key' prop here using 'link.href' as a unique identifier
             href={link.href}
             className={clsx('rounded-lg px-3 py-1 text-sm font-medium', {
               'bg-gray-700 text-gray-100 hover:bg-gray-500 hover:text-white':

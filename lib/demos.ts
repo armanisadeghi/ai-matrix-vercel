@@ -2,6 +2,7 @@ export type Item = {
   name: string;
   slug: string;
   description?: string;
+  developer?: string;
 };
 
 export const demos: { name: string; items: Item[] }[] = [
@@ -106,6 +107,23 @@ export const demos: { name: string; items: Item[] }[] = [
         name: 'CSS and CSS-in-JS',
         slug: 'styling',
         description: 'Preview the supported styling solutions',
+      },
+    ],
+  },
+  {
+    name: '--> Under Development',
+    items: [
+      {
+        name: 'Chat App',
+        slug: 'chat',
+        description: 'A sample starter chat page to test socket.io',
+        developer: 'Natalie',
+      },
+      {
+        name: 'Armani Tests',
+        slug: 'armani',
+        description: 'A little space for Armani to play and learn.',
+        developer: 'Armani',
       },
     ],
   },

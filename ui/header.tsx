@@ -1,3 +1,4 @@
+// ui/header.tsx
 'use client';
 
 import styled from 'styled-components';
@@ -33,7 +34,7 @@ const NextJsLogo = (props: any) => (
   </svg>
 );
 
-export default function Header() {
+export default function StyledHeader() {
   return (
     <HeadContainer>
       <NextJsLogo height={40} fill={`rgb(244 244 245)`} />
