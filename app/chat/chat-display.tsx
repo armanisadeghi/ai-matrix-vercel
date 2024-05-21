@@ -14,7 +14,6 @@ export const ChatDisplay: React.FC<ChatDisplayProps> = ({ aiResponse }) => {
       id="aiResponse"
       value={aiResponse}
       readOnly
-      placeholder="AI Response..."
       resizable={false}
       className="flex-grow overflow-y-auto" // Allows internal scrolling
     />
