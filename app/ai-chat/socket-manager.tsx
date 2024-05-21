@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const URL = 'https://e2069eb72e59.ngrok.app/';
+const URL = 'https://aimatrix.ngrok.app/';
 
 export const useSocketManager = (onNewResponse: (response: string) => void) => {
   const [socket, setSocket] = useState<Socket | null>(null);

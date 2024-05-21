@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "AI Matrix bridges the gap between current AI capabilities and real-world business needs.",
   "private": true,
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@9.1.2",
   "author": "Armani Sadeghi",
   "scripts": {
     "build": "next build",
